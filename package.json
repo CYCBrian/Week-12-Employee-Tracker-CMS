@@ -1,0 +1,22 @@
+{
+  "name": "week-12-employee-tracker-cms",
+  "version": "1.0.0",
+  "description": "CMS command line app made using sql, node, and inquirer.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CYCBrian/Week-12-Employee-Tracker-CMS.git"
+  },
+  "author": "CYCBrian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CYCBrian/Week-12-Employee-Tracker-CMS/issues"
+  },
+  "homepage": "https://github.com/CYCBrian/Week-12-Employee-Tracker-CMS#readme",
+  "dependencies": {
+    "inquirer": "^8.2.4"
+  }
+}
