@@ -1,5 +1,16 @@
+const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const prompts = require("./prompts");
+
+const db = mysql.createConnection(
+    {
+        host:"localhost",
+        user:"root",
+        password:"password",
+        database: "company_db"
+    },
+    console.log("Connected to the company_db database.")
+)
 
 function init(){
 inquirer.prompt(prompts).then((answers)=>{
@@ -31,6 +42,33 @@ inquirer.prompt(prompts).then((answers)=>{
         
     // TODO database inner-join
 });
-}
+};
 
 init()
+
+// // Inside the inquirer prompt
+// inquirer.prompt([
+//   {
+//     type: "list",
+//     name: "employee",
+//     message: "Select an employee to update:",
+//     choices: getEmployees() // Call the function to get the current list of employees
+//   },
+//   {
+//     type: "input",
+//     name: "newRole",
+//     message: "Enter the new role for the employee:"
+//   }
+// ]).then((answers) => {
+//   const selectedEmployee = answers.employee;
+//   const newRole = answers.newRole;
+//   // Update the employee's role in the database using SQL queries
+// });
+
+// In this example, the getEmployees function returns a promise that executes the SQL query to retrieve the employee names from the employee table. The query results are then mapped to extract the employee names, which are returned as an array.
+
+
+// Make sure to replace "your_username", "your_password", and "your_database" with the appropriate values for your MySQL database connection.
+
+
+// Let me know if you have any further questions!
