@@ -1,61 +1,76 @@
-// TODO establish connection to database
-// TODO create function to fetch data from databases
-// To fetch the list of employees from the database, you can use SQL queries to retrieve the employee names from the employee table. Here's an example using the mysql2 package:
+const mysql = require("mysql2");
 
+// Create a connection to the database
+const db = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "password",
+  database: "company_db",
+});
 
-// const mysql = require("mysql2");
+// Function to fetch the list of departments from the database
+function getDepartments() {
+  return new Promise((resolve, reject) => {
+    // Execute the SQL query to retrieve the departments
+    db.query("SELECT * FROM department", (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        // Extract the department names from the query results
+        const departmentInfo = results.map((row) => `${row.id} ${row.name}`);
+        resolve(departmentInfo);
+      }
+    });
+  });
+}
 
-// // Create a connection to the database
-// const connection = mysql.createConnection({
-//   host: "localhost",
-//   user: "your_username",
-//   password: "your_password",
-//   database: "your_database"
-// });
+// Function to fetch the list of roles from the database
+function getRoles() {
+  return new Promise((resolve, reject) => {
+    // Execute the SQL query to retrieve the roles
+    db.query("SELECT * FROM role", (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        // Extract the role titles from the query results
+        const roleInfo = results.map((row) => `${row.id} ${row.title} ${row.salary} ${row.department_id}`);
+        resolve(roleInfo);
+      }
+    });
+  });
+}
 
-// // Function to fetch the list of employees from the database
-// function getEmployees() {
-//   return new Promise((resolve, reject) => {
-//     // Execute the SQL query to retrieve the employee names
-//     connection.query("SELECT CONCAT(first_name, ' ', last_name) AS employee_name FROM employee", (error, results) => {
-//       if (error) {
-//         reject(error);
-//       } else {
-//         // Extract the employee names from the query results
-//         const employeeNames = results.map((row) => row.employee_name);
-//         resolve(employeeNames);
-//       }
-//     });
-//   });
-// }
+// Function to fetch the list of employees from the database
+function getEmployees() {
+  return new Promise((resolve, reject) => {
+    // Execute the SQL query to retrieve the employees
+    db.query("SELECT * FROM employee", (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        // Extract the employee names from the query results
+        const employeeInfo = results.map((row) => `${row.id} ${row.first_name} ${row.last_name} ${row.role_id} ${row.manager_id}`);
+        resolve(employeeInfo);
+      }
+    });
+  });
+}
 
-// // Inside the inquirer prompt
-// inquirer.prompt([
-//   {
-//     type: "list",
-//     name: "employee",
-//     message: "Select an employee to update:",
-//     choices: getEmployees() // Call the function to get the current list of employees
-//   },
-//   {
-//     type: "input",
-//     name: "newRole",
-//     message: "Enter the new role for the employee:"
-//   }
-// ]).then((answers) => {
-//   const selectedEmployee = answers.employee;
-//   const newRole = answers.newRole;
-//   // Update the employee's role in the database using SQL queries
-// });
-
-// In this example, the getEmployees function returns a promise that executes the SQL query to retrieve the employee names from the employee table. The query results are then mapped to extract the employee names, which are returned as an array.
-
-
-// Make sure to replace "your_username", "your_password", and "your_database" with the appropriate values for your MySQL database connection.
-
-
-// Let me know if you have any further questions!
-
+// Function to fetch the list of managers from the database
+function getManagers() {
+  return new Promise((resolve, reject) => {
+    // Execute the SQL query to retrieve the managers
+    db.query("SELECT * FROM employee WHERE manager_id IS NULL", (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        // Extract the manager names from the query results
+        const managerInfo = results.map((row) => `${row.id} ${row.first_name} ${row.last_name} ${row.role_id}`);
+        resolve(managerInfo);
+      }
+    });
+  });
+}
 
 const prompts = [
     {
@@ -104,13 +119,13 @@ const prompts = [
         type: "list",
         name: "update-employee-role",
         message: "Please select the employee's new role.",
-        choices: newRole()
+        choices: getRoles()
     },
     {
         type: "list",
         name: "update-employee-manager",
-        message: "Please select the employee's new manager.",
-        choices: newManager()
+        message: "Please select the employee's new manager, or press enter if not applicable",
+        choices: getManagers()
     },
     {
         type: "list",
@@ -129,7 +144,7 @@ const prompts = [
         name: "remove-employee",
         message: "Please select the employee you wish to remove.",
         choices: getEmployees()
-    },
+    }
 ]
 
 module.exports = prompts;
