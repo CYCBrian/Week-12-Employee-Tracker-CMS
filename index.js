@@ -1,7 +1,8 @@
 const mysql = require ("mysql2");
 const inquirer = require ("inquirer");
-const { prompts } = require ("./lib/prompts.js");
-const { viewDepartments, viewRoles, viewEmployees } = require ("./lib/viewFunctions.js")
+const prompts = require ("./lib/prompts");
+const { viewDepartments, viewRoles, viewEmployees } = require ("./lib/viewFunctions")
+const { deleteDepartment, deleteRole, deleteEmployee } = require ("./lib/deleteFunctions")
 
 const db = mysql.createConnection(
     {
@@ -23,7 +24,6 @@ db.connect((error) => {
 
 function init() {
     inquirer.prompt(prompts).then((answers) => {
-      // TODO database navigation
       // SELECT * FROM department;
       if (answers.menu === "View all departments.") {
         viewDepartments()
@@ -38,23 +38,30 @@ function init() {
       else if (answers.menu === "View all employees.") {
         viewEmployees()
       }
-        // INSERT INTO department (name) VALUES 
-      //   else if (answers.menu === "Add a department"){
 
-      // }     
+      // DELETE from department WHERE ID = ___;
+      else if (answers.menu === "Remove a department.") {
+        deleteDepartment()
+      }
+
+      // DELETE from role WHERE ID = ___;
+      else if (answers.menu === "Remove a role.") {
+        deleteRole()
+      }
+
+      // DELETE from employee WHERE ID = ___;
+      else if (answers.menu === "Remove an employee.") {
+        deleteEmployee()
+      }
     });
   }
 
     // TODO database manipulation
         // Add
-
+        // INSERT INTO department (name) VALUES 
+      //   else if (answers.menu === "Add a department"){
         // INSERT INTO role (title, salary, department_id) VALUES
         // INSERT INTO employee (first_name, last_name, role_is, manager_id) VALUES
-        
-        // Remove
-        // DELETE from department WHERE ID = ___;
-        // DELETE from role WHERE ID = ___;
-        // DELETE from employee WHERE ID = ___;
         
         // Update
         // -- Select the employee with ID 3
