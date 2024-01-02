@@ -3,6 +3,7 @@ const inquirer = require ("inquirer");
 const prompts = require ("./lib/prompts");
 const { viewDepartments, viewRoles, viewEmployees } = require ("./lib/viewFunctions")
 const { deleteDepartment, deleteRole, deleteEmployee } = require ("./lib/deleteFunctions")
+const { addDepartment, addRole, addEmployee }  = require ("./lib/addFunctions")
 
 const db = mysql.createConnection(
     {
@@ -27,6 +28,9 @@ function init() {
       // SELECT * FROM department;
       if (answers.menu === "View all departments.") {
         viewDepartments()
+        // .then(() => {
+        //   inquirer.prompt(prompts)
+      //  })
       }
   
       // SELECT * FROM role;
@@ -53,15 +57,26 @@ function init() {
       else if (answers.menu === "Remove an employee.") {
         deleteEmployee()
       }
+
+      // INSERT INTO department (name) VALUES 
+      else if (answers.menu === "Add a department."){
+        addDepartment()
+      }
+
+      // INSERT INTO role (title, salary, department_id) VALUES
+      else if (answers.menu === "Add a role."){
+        addRole()
+      }
+      
+      // INSERT INTO employee (first_name, last_name, role_is, manager_id) VALUES
+      else if (answers.menu === "Add a employee."){
+        addEmployee()
+      }
+
     });
   }
 
     // TODO database manipulation
-        // Add
-        // INSERT INTO department (name) VALUES 
-      //   else if (answers.menu === "Add a department"){
-        // INSERT INTO role (title, salary, department_id) VALUES
-        // INSERT INTO employee (first_name, last_name, role_is, manager_id) VALUES
         
         // Update
         // -- Select the employee with ID 3
