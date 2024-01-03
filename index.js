@@ -2,7 +2,7 @@ const mysql = require ("mysql2");
 const inquirer = require ("inquirer");
 const prompts = require ("./lib/prompts");
 const { viewDepartments, viewRoles, viewEmployees } = require ("./lib/viewFunctions")
-const { deleteDepartment, deleteRole, deleteEmployee } = require ("./lib/deleteFunctions")
+// const { deleteDepartment, deleteRole, deleteEmployee } = require ("./lib/deleteFunctions")
 const { addDepartment, addRole, addEmployee }  = require ("./lib/addFunctions")
 
 const db = mysql.createConnection(
@@ -28,9 +28,6 @@ function init() {
       // SELECT * FROM department;
       if (answers.menu === "View all departments.") {
         viewDepartments()
-        // .then(() => {
-        //   inquirer.prompt(prompts)
-      //  })
       }
   
       // SELECT * FROM role;
@@ -43,38 +40,45 @@ function init() {
         viewEmployees()
       }
 
-      // DELETE from department WHERE ID = ___;
-      else if (answers.menu === "Remove a department.") {
-        deleteDepartment()
-      }
-
-      // DELETE from role WHERE ID = ___;
-      else if (answers.menu === "Remove a role.") {
-        deleteRole()
-      }
-
-      // DELETE from employee WHERE ID = ___;
-      else if (answers.menu === "Remove an employee.") {
-        deleteEmployee()
-      }
-
       // INSERT INTO department (name) VALUES 
-      else if (answers.menu === "Add a department."){
-        addDepartment()
+      else if (answers.menu === "Add a department.") {
+        addDepartment(answers)
       }
 
       // INSERT INTO role (title, salary, department_id) VALUES
-      else if (answers.menu === "Add a role."){
-        addRole()
+      else if (answers.menu === "Add a role.") {
+        addRole(answers)
       }
       
       // INSERT INTO employee (first_name, last_name, role_is, manager_id) VALUES
-      else if (answers.menu === "Add a employee."){
-        addEmployee()
+      else if (answers.menu === "Add a employee.") {
+        addEmployee(answers)
       }
+
+      // UPDATE employee SET role_id = ___ WHERE employee.id = ___
+      else if (answers.menu === "Update an employee's role.") {
+        updateEmployeeRole(answers)
+      }
+
+      // // DELETE from department WHERE ID = ___;
+      // else if (answers.menu === "Remove a department.") {
+      //   deleteDepartment()
+      // }
+
+      // // DELETE from role WHERE ID = ___;
+      // else if (answers.menu === "Remove a role.") {
+      //   deleteRole()
+      // }
+
+      // // DELETE from employee WHERE ID = ___;
+      // else if (answers.menu === "Remove an employee.") {
+      //   deleteEmployee()
+      // }
 
     });
   }
+
+  module.exports = init
 
     // TODO database manipulation
         
