@@ -66,7 +66,7 @@ const prompts = [
   {
     type: "list",
     name: "menu",
-    message: "Welcome. What would you like to do?",
+    message: "What would you like to do?",
     choices: [
       // Options for user selection.
       "View all departments.",
@@ -79,26 +79,23 @@ const prompts = [
       "Exit."
     ]
   }
-  // {
-  //   type: "input",
-  //   name: "addRole",
-  //   message: "Please enter the role's title, salary, and department (title, salary, department).",
-  //   when: (answers) => answers.menu === "Add a role.",
-  //   transformer: (input) => {
-  //     const [title, salary, department_id] = input.split(",");
-  //     return { title, salary, department_id };
-  //   }
-  // },
 ]
 
+// Flag to track if the welcome message has been displayed
+let hasDisplayedWelcomeMessage = false
 
 // Function to handle user selection in menu.
 function init() {
-  // Display welcome message.
-  console.log('         !!!!!!!!!!!!!!!!!!!!!!')
-  console.log('         !      EMPLOYEE      !')
-  console.log('         !      TRACKER!      !')
-  console.log('         !!!!!!!!!!!!!!!!!!!!!!')
+  if (!hasDisplayedWelcomeMessage) {
+    // Display welcome message only if it hasn't been displayed before
+    console.log('         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    console.log('         !       WELCOME TO THE      !');
+    console.log('         !          EMPLOYEE         !');
+    console.log('         !          TRACKER!         !');
+    console.log('         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    
+    hasDisplayedWelcomeMessage = true; // Set the flag to true after displaying the message
+  }
 
   // Prompt user with the menu option.
   inquirer.prompt(prompts).then((answers) => {
@@ -362,10 +359,10 @@ function init() {
       // Display a farewell message.
       // Exit the process with a status code of 0.
       else if (answers.menu === "Exit."){
-        console.log('     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-        console.log('     !          EXITING...         !')
-        console.log('     !      HAVE A GREAT DAY!      !')
-        console.log('     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        console.log('        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        console.log('        !          EXITING...         !')
+        console.log('        !      HAVE A GREAT DAY!      !')
+        console.log('        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         process.exit(0);
       }
 
