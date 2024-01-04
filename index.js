@@ -72,6 +72,7 @@ const prompts = [
       "Add a role.",
       "Add an employee.",
       "Update an employee's role.",
+      "Exit."
     ]
   }
   // {
@@ -272,6 +273,12 @@ function init() {
       // UPDATE employee SET role_id = ___ WHERE employee.id = ___
       else if (answers.menu === "Update an employee's role.") {
         updateEmployeeRole(answers)
+      }
+
+      // Exit application.
+      else if (answers.menu === "Exit."){
+        console.log('Exiting... Have a great day!');
+        process.exit(0);
       }
 
     });
