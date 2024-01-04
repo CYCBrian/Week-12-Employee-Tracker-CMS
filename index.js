@@ -1,7 +1,8 @@
+//Import required modules.
 const mysql = require ("mysql2");
 const inquirer = require ("inquirer");
 
-// Log in credentials and database declaration
+// Log in credentials and database declaration.
 const db = mysql.createConnection(
     {
         host:"localhost",
@@ -11,7 +12,7 @@ const db = mysql.createConnection(
     },
 )
 
-// Establish connection with SQL, then initialize init function.
+// Establish connection with SQL, then run init function.
 db.connect((error) => {
     if (error) {
       console.error("Error connecting to the database:", error);
@@ -21,7 +22,7 @@ db.connect((error) => {
     init();
 });
 
-// Function to retrieve information from tables in company_db
+// Function to retrieve information from department table in company_db.
 function getDepartments() {
   return new Promise((resolve, reject) => {
     db.query("SELECT * FROM department", (error, results) => {
@@ -34,6 +35,7 @@ function getDepartments() {
   });
 }
 
+// Function to retrieve information from role table in company_db.
 function getRoles() {
   return new Promise((resolve, reject) => {
     db.query("SELECT * FROM role", (error, results) => {
@@ -46,6 +48,7 @@ function getRoles() {
   });
 }
 
+// Function to retrieve information from employee table in company_db.
 function getEmployees() {
   return new Promise((resolve, reject) => {
     db.query("SELECT * FROM employee", (error, results) => {
@@ -65,6 +68,7 @@ const prompts = [
     name: "menu",
     message: "Welcome. What would you like to do?",
     choices: [
+      // Options for user selection.
       "View all departments.",
       "View all roles.",
       "View all employees.",
@@ -90,64 +94,75 @@ const prompts = [
 
 // Function to handle user selection in menu.
 function init() {
+  // Display welcome message.
+  console.log('         !!!!!!!!!!!!!!!!!!!!!!')
+  console.log('         !      EMPLOYEE      !')
+  console.log('         !      TRACKER!      !')
+  console.log('         !!!!!!!!!!!!!!!!!!!!!!')
+
+  // Prompt user with the menu option.
   inquirer.prompt(prompts).then((answers) => {
-    // SELECT * FROM department;
+    // Handle user selections based on the chosen menu option.
+
+    // If user wants to view the department table.
     if (answers.menu === "View all departments.") {
-      // Call the unnamed function directly
+      // Retrieve and display all departments.
       (() => {
         getDepartments()
           .then((departmentInfo) => {
             console.table(departmentInfo);
-            init();
+            init(); //Return to menu.
           })
           .catch((error) => {
             console.error("Error retrieving departments:", error);
-            init();
+            init(); //Return to menu.
           });
       })();
     }
   
-      // SELECT * FROM role;
+      // If user wants to view the role table.
       else if (answers.menu === "View all roles.") {
+        // Retrieve and display all role.
         (() => {
           getRoles()
             .then((roleInfo) => {
               console.table(roleInfo);
-              init();
+              init(); //Return to menu.
             })
             .catch((error) => {
               console.error("Error retrieving roles:", error);
-              init();
+              init();  //Return to menu.
             });
         })();
       }
   
-      // SELECT * FROM employee;
+      // If user wants to view the employee table.
       else if (answers.menu === "View all employees.") {
+        // Retrieve and display all employees.
         (() => {
           getEmployees()
             .then((employeeInfo) => {
               console.table(employeeInfo);
-              init();
+              init();  //Return to menu.
             })
             .catch((error) => {
               console.error("Error retrieving employees:", error);
-              init();
+              init();  //Return to menu.
             });
         })();
       }
 
-      // INSERT INTO department (name) VALUES 
+      // If user wants to add a department.
+      // Prompt the user to enter the name of the department they wish to add.
+      // Insert the department into the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
       else if (answers.menu === "Add a department.") {
-        inquirer
-          .prompt([
+        inquirer.prompt([
             {
               type: "input",
               name: "addDepartment",
               message: "Please enter the name of the department you wish to add.",
-              validate: (input) => {
-                return input ? true : "Please enter the name of the department.";
-              },
             },
           ])
           .then((departmentAnswers) => {
@@ -167,18 +182,21 @@ function init() {
             });
           })
           .then(() => {
-            init();
+            init();  //Return to menu.
           })
           .catch((error) => {
             console.error("Error adding department:", error);
-            init();
+            init();  //Return to menu.
           });
       }
 
-      // INSERT INTO role (title, salary, department_id) VALUES
+      // If user wants to add a role.
+      // Prompt the user to enter the title, salary, and department ID for the role.
+      // Insert the role into the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
       else if (answers.menu === "Add a role.") {
-        inquirer
-          .prompt([
+        inquirer.prompt([
             {
               type: "input",
               name: "title",
@@ -212,18 +230,21 @@ function init() {
             });
           })
           .then(() => {
-            init();
+            init();  //Return to menu.
           })
           .catch((error) => {
             console.error("Error adding role:", error);
-            init();
+            init();  //Return to menu.
           });
       }
       
-      // INSERT INTO employee (first_name, last_name, role_is, manager_id) VALUES
+      // If user wants to add an employee.
+      // Prompt the user to enter the first name, last name, role ID, and manager ID for the employee.
+      // Insert the employee into the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
       else if (answers.menu === "Add an employee.") {
-        inquirer
-          .prompt([
+        inquirer.prompt([
             {
               type: "input",
               name: "firstName",
@@ -262,24 +283,91 @@ function init() {
             });
           })
           .then(() => {
-            init();
+            init();  //Return to menu.
           })
           .catch((error) => {
             console.error("Error adding employee:", error);
-            init();
+            init();  //Return to menu.
           });
       }
 
-      // UPDATE employee SET role_id = ___ WHERE employee.id = ___
+      // If user wants to update an employee's role.
+      // Prompt the user to select the employee to update and the new role for the employee.
+      // Update the employee's role in the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
       else if (answers.menu === "Update an employee's role.") {
-        updateEmployeeRole(answers)
+        inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'employee',
+              message: 'Select the employee you wish to update.',
+              choices: () => {
+                return getEmployees().then((employees) => {
+                  return employees.map((employee) => {
+                    return {
+                      name: `${employee.first_name} ${employee.last_name}`,
+                      value: employee.id,
+                    };
+                  });
+                });
+              },
+            },
+            {
+              type: 'list',
+              name: 'role',
+              message: "Select the employee's new role.",
+              choices: () => {
+                return getRoles().then((roles) => {
+                  return roles.map((role) => {
+                    return {
+                      name: `${role.title}`,
+                      value: role.id,
+                    };
+                  });
+                });
+              },
+            },
+          ])
+          .then((updateAnswers) => {
+            return new Promise((resolve, reject) => {
+              db.query(
+                `UPDATE employee SET ? WHERE ?`,
+                [
+                  { role_id: updateAnswers.role },
+                  { id: updateAnswers.employee },
+                ],
+                (error, results) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    console.log("Successfully updated employee's role.");
+                    resolve();
+                  }
+                }
+              );
+            });
+          })
+          .then(() => {
+            init()  //Return to menu.
+          })
+          .catch((error) => {
+            console.error("Error updating employee:", error);
+            init();  //Return to menu.
+          });
       }
 
-      // Exit application.
+      // If user wants to exit.
+      // Display a farewell message.
+      // Exit the process with a status code of 0.
       else if (answers.menu === "Exit."){
-        console.log('Exiting... Have a great day!');
+        console.log('     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+        console.log('     !          EXITING...         !')
+        console.log('     !      HAVE A GREAT DAY!      !')
+        console.log('     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
         process.exit(0);
       }
 
     });
-  }
+  };
