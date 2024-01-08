@@ -61,6 +61,18 @@ function getEmployees() {
   });
 }
 
+function getManagers() {
+  return new Promise((resolve, reject) => {
+    db.query("SELECT * FROM employee WHERE manager_id IS NULL", (error, results) => {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(results);
+      }
+    });
+  });
+}
+
 // Prompts constant
 const prompts = [
   {
@@ -76,6 +88,10 @@ const prompts = [
       "Add a role.",
       "Add an employee.",
       "Update an employee's role.",
+      "Update an employee's manager.",
+      "Delete a department.",
+      "Delete a role.",
+      "Delete an employee.",
       "Exit."
     ]
   }
@@ -319,7 +335,7 @@ function init() {
                 return getRoles().then((roles) => {
                   return roles.map((role) => {
                     return {
-                      name: `${role.title}`,
+                      name: `${ role.title }`,
                       value: role.id,
                     };
                   });
@@ -352,6 +368,220 @@ function init() {
           .catch((error) => {
             console.error("Error updating employee:", error);
             init();  //Return to menu.
+          });
+      }
+
+      // If user wants to update an employee's manager.
+      // Prompt the user to select the employee to update and the new manager for the employee.
+      // Update the employee's manager in the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
+      else if (answers.menu === "Update an employee's manager.") {
+        inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'employee',
+              message: 'Select the employee you wish to update.',
+              choices: () => {
+                return getEmployees().then((employees) => {
+                  return employees.map((employee) => {
+                    return {
+                      name: `${employee.first_name} ${employee.last_name}`,
+                      value: employee.id,
+                    };
+                  });
+                });
+              },
+            },
+            {
+              type: 'list',
+              name: 'manager',
+              message: "Select the employee's new manager.",
+              choices: () => {
+                return getManagers().then((managers) => {
+                  return managers.map((manager) => {
+                    return {
+                      name: `${manager.first_name} ${manager.last_name} ${manager.role_id}`,
+                      value: manager.id,
+                    };
+                  });
+                });
+              },
+            },
+          ])
+          .then((updateAnswers) => {
+            return new Promise((resolve, reject) => {
+              db.query(
+                `UPDATE employee SET ? WHERE ?`,
+                [
+                  { manager_id: updateAnswers.manager },
+                  { id: updateAnswers.employee },
+                ],
+                (error, results) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    console.log("Successfully updated employee's manager.");
+                    resolve();
+                  }
+                }
+              );
+            });
+          })
+          .then(() => {
+            init(); // Return to menu.
+          })
+          .catch((error) => {
+            console.error("Error updating employee:", error);
+            init(); // Return to menu.
+          });
+      }
+
+      // If user wants to delete a department.
+      // Prompt the user to select the department to delete.
+      // Update the department table in the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
+      else if (answers.menu === "Delete a department.") {
+        inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'department',
+              message: 'Select the department you wish to delete.',
+              choices: () => {
+                return getDepartments().then((departments) => {
+                  return departments.map((department) => {
+                    return {
+                      name: department.name,
+                      value: department.id,
+                    };
+                  });
+                });
+              },
+            },
+          ])
+          .then((deleteDepartment) => {
+            return new Promise((resolve, reject) => {
+              db.query(
+                `DELETE FROM department WHERE ?`,
+                [{ id: deleteDepartment.department }],
+                (error, results) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    console.log("Successfully deleted department.");
+                    resolve();
+                  }
+                }
+              );
+            });
+          })
+          .then(() => {
+            init(); // Return to menu.
+          })
+          .catch((error) => {
+            console.error("Error deleting department:", error);
+            init(); // Return to menu.
+          });
+      }
+
+      // If user wants to delete a department.
+      // Prompt the user to select the department to delete.
+      // Update the department table in the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
+      else if (answers.menu === "Delete a role.") {
+        inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'role',
+              message: 'Select the role you wish to delete.',
+              choices: () => {
+                return getRoles().then((roles) => {
+                  return roles.map((role) => {
+                    return {
+                      name: role.title,
+                      value: role.id,
+                    };
+                  });
+                });
+              },
+            },
+          ])
+          .then((deleteRole) => {
+            return new Promise((resolve, reject) => {
+              db.query(
+                `DELETE FROM role WHERE ?`,
+                [{ id: deleteRole.role }],
+                (error, results) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    console.log("Successfully deleted role.");
+                    resolve();
+                  }
+                }
+              );
+            });
+          })
+          .then(() => {
+            init(); // Return to menu.
+          })
+          .catch((error) => {
+            console.error("Error deleting department:", error);
+            init(); // Return to menu.
+          });
+      }
+
+      // If user wants to delete an employee.
+      // Prompt the user to select the employee to delete.
+      // Update the employee table in the database.
+      // If successful, log a success message and return to the menu.
+      // If there is an error, log the error message and return to the menu.
+      else if (answers.menu === "Delete an employee.") {
+        inquirer
+          .prompt([
+            {
+              type: 'list',
+              name: 'employee',
+              message: 'Select the employee you wish to delete.',
+              choices: () => {
+                return getEmployees().then((employees) => {
+                  return employees.map((employee) => {
+                    return {
+                      name: `${employee.first_name} ${employee.last_name}`,
+                      value: employee.id,
+                    };
+                  });
+                });
+              },
+            },
+          ])
+          .then((deleteEmployee) => {
+            return new Promise((resolve, reject) => {
+              db.query(
+                `DELETE FROM employee WHERE ?`,
+                [{ id: deleteEmployee.employee }],
+                (error, results) => {
+                  if (error) {
+                    reject(error);
+                  } else {
+                    console.log("Successfully deleted employee.");
+                    resolve();
+                  }
+                }
+              );
+            });
+          })
+          .then(() => {
+            init(); // Return to menu.
+          })
+          .catch((error) => {
+            console.error("Error deleting employee:", error);
+            init(); // Return to menu.
           });
       }
 
