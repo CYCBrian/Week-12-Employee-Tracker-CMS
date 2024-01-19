@@ -34,7 +34,7 @@ The Employee Tracker provides the following functionality:
 
 ## Demo
 
-[Watch the app in action!](./Assets/employee_tracker_cms_demo.webm)
+[Watch the app in action!](https://drive.google.com/file/d/1DNc80ILRO8OfFlhCn00xWMi01Qj7tNse/view)
 
 ## Installation and Usage
 
