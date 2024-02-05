@@ -24,8 +24,8 @@ The Employee Tracker provides the following functionality:
 - **View All Roles**: Displays a formatted table showing role IDs, role titles, salaries, and associated department IDs.
 - **View All Employees**: Displays a formatted table showing employee IDs, first names, last names, associated role IDs, and associated manager IDs (if applicable).
 - **Add a Department**: Adds a department to the database by entering a department name.
-- **Add a Role**: Adds a role to the database by entering its title, salary, and department ID.
-- **Add an Employee**: Adds an employee to the database by entering their first name, last name, role ID, and manager ID (if applicable).
+- **Add a Role**: Adds a role to the database by entering its title, salary, and selecting an department.
+- **Add an Employee**: Adds an employee to the database by entering their first name, last name, and selecting their role and manager.
 - **Update an Employee's Role**: Updates an employee's role by selecting an employee and assigning a new role.
 - **Update an Employee's Manager**: Updates an employee's manager by selecting an employee and assigning a new manager.
 - **Delete a Department**: Allows the user to select a department to delete from the database.
@@ -34,7 +34,7 @@ The Employee Tracker provides the following functionality:
 
 ## Demo
 
-[Watch the app in action!](https://drive.google.com/file/d/1DNc80ILRO8OfFlhCn00xWMi01Qj7tNse/view)
+[Watch the app in action!](https://drive.google.com/file/d/1_3gC0REaLzTGM9XKmVFA-trRgB6dQa_G/view?usp=sharing)
 
 ## Installation and Usage
 
