@@ -38,7 +38,12 @@ function getDepartments() {
 // Function to retrieve information from role table in company_db.
 function getRoles() {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM role", (error, results) => {
+    const query = `
+      SELECT role.id, role.title, role.salary, department.name AS department
+      FROM role
+      INNER JOIN department ON role.department_id = department.id
+    `;
+    db.query(query, (error, results) => {
       if (error) {
         reject(error);
       } else {
@@ -51,7 +56,13 @@ function getRoles() {
 // Function to retrieve information from employee table in company_db.
 function getEmployees() {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM employee", (error, results) => {
+    const query = `
+      SELECT employee.id, employee.first_name, employee.last_name, role.title, CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+      FROM employee
+      INNER JOIN role ON employee.role_id = role.id
+      LEFT JOIN employee AS manager ON employee.manager_id = manager.id
+    `;
+    db.query(query, (error, results) => {
       if (error) {
         reject(error);
       } else {
@@ -61,9 +72,16 @@ function getEmployees() {
   });
 }
 
+//function to retrieve information from employee table in company_db. Only display employees whose manager id is Null.
 function getManagers() {
   return new Promise((resolve, reject) => {
-    db.query("SELECT * FROM employee WHERE manager_id IS NULL", (error, results) => {
+    const query = `
+      SELECT employee.id, employee.first_name, employee.last_name, role.title AS role
+      FROM employee
+      INNER JOIN role ON employee.role_id = role.id
+      WHERE employee.manager_id IS NULL
+    `;
+    db.query(query, (error, results) => {
       if (error) {
         reject(error);
       } else {
@@ -204,7 +222,7 @@ function init() {
       }
 
       // If user wants to add a role.
-      // Prompt the user to enter the title, salary, and department ID for the role.
+      // Prompt the user to enter the title, salary, and select the role's department.
       // Insert the role into the database.
       // If successful, log a success message and return to the menu.
       // If there is an error, log the error message and return to the menu.
@@ -221,9 +239,19 @@ function init() {
               message: "Please enter the role's salary:",
             },
             {
-              type: "input",
+              type: "list",
               name: "department_id",
-              message: "Please enter the role's department ID:",
+              message: "Please select the department for the role:",
+              choices: () => {
+                return getDepartments().then((departments) => {
+                  return departments.map((department) => {
+                    return {
+                      name: department.name,
+                      value: department.id,
+                    };
+                  });
+                });
+              },
             },
           ])
           .then((roleAnswers) => {
@@ -252,7 +280,7 @@ function init() {
       }
       
       // If user wants to add an employee.
-      // Prompt the user to enter the first name, last name, role ID, and manager ID for the employee.
+      // Prompt the user to enter the first name, last name, and select the employee's role and manager for the employee.
       // Insert the employee into the database.
       // If successful, log a success message and return to the menu.
       // If there is an error, log the error message and return to the menu.
@@ -269,21 +297,41 @@ function init() {
               message: "Please enter the employee's last name:",
             },
             {
-              type: "input",
+              type: "list",
               name: "roleId",
-              message: "Please enter the employee's role ID:",
+              message: "Please select the employee's role:",
+              choices: () => {
+                return getRoles().then((roles) => {
+                  return roles.map((role) => {
+                    return {
+                      name: `${ role.title }`,
+                      value: role.id,
+                    };
+                  });
+                });
+              },
             },
             {
-              type: "input",
+              type: "list",
               name: "managerId",
-              message: "Please enter the employee's manager ID (leave blank if none):",
+              message: "Please select the employee's manager:",
+              choices: () => {
+                return getManagers().then((managers) => {
+                  const managerChoices = managers.map((manager) => ({
+                    name: `${manager.first_name} ${manager.last_name} ${manager.role}`,
+                    value: manager.id,
+                  }));
+                  managerChoices.push({ name: "None", value: null });
+                  return managerChoices;
+                });
+              },
             },
           ])
           .then((employeeAnswers) => {
             const { firstName, lastName, roleId, managerId } = employeeAnswers;
             return new Promise((resolve, reject) => {
               db.query(
-                `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${firstName}', '${lastName}', ${roleId}, ${managerId || null})`,
+                `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${firstName}', '${lastName}', ${roleId}, ${managerId})`,
                 (error, results) => {
                   if (error) {
                     reject(error);
@@ -296,16 +344,16 @@ function init() {
             });
           })
           .then(() => {
-            init();  //Return to menu.
+            init(); // Return to menu.
           })
           .catch((error) => {
             console.error("Error adding employee:", error);
-            init();  //Return to menu.
+            init(); // Return to menu.
           });
       }
 
       // If user wants to update an employee's role.
-      // Prompt the user to select the employee to update and the new role for the employee.
+      // Prompt the user to select the employee and to select the new role for the employee.
       // Update the employee's role in the database.
       // If successful, log a success message and return to the menu.
       // If there is an error, log the error message and return to the menu.
@@ -372,7 +420,7 @@ function init() {
       }
 
       // If user wants to update an employee's manager.
-      // Prompt the user to select the employee to update and the new manager for the employee.
+      // Prompt the user to select the employee and to select a new manager for the employee.
       // Update the employee's manager in the database.
       // If successful, log a success message and return to the menu.
       // If there is an error, log the error message and return to the menu.
@@ -400,12 +448,12 @@ function init() {
               message: "Select the employee's new manager.",
               choices: () => {
                 return getManagers().then((managers) => {
-                  return managers.map((manager) => {
-                    return {
-                      name: `${manager.first_name} ${manager.last_name} ${manager.role_id}`,
-                      value: manager.id,
-                    };
-                  });
+                  const managerChoices = managers.map((manager) => ({
+                    name: `${manager.first_name} ${manager.last_name} ${manager.role}`,
+                    value: manager.id,
+                  }));
+                  managerChoices.push({ name: "None", value: null });
+                  return managerChoices;
                 });
               },
             },
@@ -452,14 +500,14 @@ function init() {
               message: 'Select the department you wish to delete.',
               choices: () => {
                 return getDepartments().then((departments) => {
-                  return departments.map((department) => {
-                    return {
-                      name: department.name,
-                      value: department.id,
-                    };
-                  });
-                });
-              },
+                  const departmentChoices = departments.map((department) => ({
+                    name: `${department.name}`,
+                    value: department.id,
+                  }))
+                  departmentChoices.push({name:"None", value:null});
+                  return departmentChoices
+                })
+              }
             },
           ])
           .then((deleteDepartment) => {
@@ -501,14 +549,14 @@ function init() {
               message: 'Select the role you wish to delete.',
               choices: () => {
                 return getRoles().then((roles) => {
-                  return roles.map((role) => {
-                    return {
-                      name: role.title,
-                      value: role.id,
-                    };
-                  });
-                });
-              },
+                  const roleChoices = roles.map((role) => ({
+                    name: `${role.title}`,
+                    value: role.id,
+                  }))
+                  roleChoices.push({name:"None", value:null});
+                  return roleChoices
+                })
+              }
             },
           ])
           .then((deleteRole) => {
@@ -550,14 +598,14 @@ function init() {
               message: 'Select the employee you wish to delete.',
               choices: () => {
                 return getEmployees().then((employees) => {
-                  return employees.map((employee) => {
-                    return {
-                      name: `${employee.first_name} ${employee.last_name}`,
-                      value: employee.id,
-                    };
-                  });
-                });
-              },
+                  const employeeChoices = employees.map((employee) => ({
+                    name: `${employee.first_name} ${employee.last_name}`,
+                    value: employee.id,
+                  }))
+                  employeeChoices.push({name:"None", value:null});
+                  return employeeChoices
+                })
+              }
             },
           ])
           .then((deleteEmployee) => {
